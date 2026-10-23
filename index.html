@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICSE Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-deep:      #0a0c14;
+    --bg-mid:       #0f1220;
+    --glass-bg:     rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.09);
+    --glass-hover:  rgba(255,255,255,0.07);
+    --accent:       #7c9cff;
+    --accent-soft:  rgba(124,156,255,0.15);
+    --accent-glow:  rgba(124,156,255,0.08);
+    --correct:      #4ade80;
+    --correct-soft: rgba(74,222,128,0.12);
+    --wrong:        #f87171;
+    --wrong-soft:   rgba(248,113,113,0.12);
+    --text-primary: rgba(255,255,255,0.92);
+    --text-secondary: rgba(255,255,255,0.52);
+    --text-muted:   rgba(255,255,255,0.28);
+    --radius:       14px;
+    --radius-sm:    8px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* subtle static gradient orbs — CSS only, zero JS, zero extra RAM */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 10%, rgba(80,100,220,0.10) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 60% at 80% 90%, rgba(100,60,200,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── PAGE LOAD FADE ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .page-load { animation: fadeUp 0.55s ease both; }
+  .page-load-delay { animation: fadeUp 0.55s 0.12s ease both; }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 36px 48px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .site-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  .site-title span {
+    color: var(--accent);
+  }
+
+  .header-badge {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 5px 12px;
+    border-radius: 100px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  /* ── SUBJECT + CHAPTER NAVIGATION ── */
+  nav {
+    position: relative;
+    z-index: 10;
+    padding: 28px 48px 0;
+  }
+
+  .subject-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .subject-tab {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 100px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.01em;
+  }
+
+  .subject-tab:hover {
+    background: var(--glass-hover);
+    color: var(--text-primary);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .subject-tab.active {
+    background: var(--accent-soft);
+    border-color: rgba(124,156,255,0.35);
+    color: var(--accent);
+  }
+
+  .chapter-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .chapter-tab {
+    font-size: 0.76rem;
+    font-weight: 400;
+    padding: 6px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--glass-border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .chapter-tab:hover {
+    color: var(--text-secondary);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .chapter-tab.active {
+    background: var(--glass-bg);
+    border-color: rgba(255,255,255,0.14);
+    color: var(--text-primary);
+  }
+
+  /* ── DIVIDER ── */
+  .nav-divider {
+    position: relative;
+    z-index: 10;
+    margin: 20px 48px 0;
+    height: 1px;
+    background: var(--glass-border);
+  }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    position: relative;
+    z-index: 10;
+    padding: 32px 48px 64px;
+    max-width: 1100px;
+  }
+
+  .section-block { display: none; }
+  .section-block.visible { display: block; }
+
+  .section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--glass-border);
+    letter-spacing: 0.01em;
+  }
+
+  .questions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  /* ── GLASS CARD ── */
+  .card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+  }
+
+  .card:hover { border-color: rgba(255,255,255,0.14); }
+
+  /* ── MCQ CARD ── */
+  .mcq-card .card-q {
+    padding: 18px 20px 14px;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+
+  .mcq-options {
+    padding: 0 20px 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .mcq-opt {
+    font-size: 0.82rem;
+    padding: 9px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: left;
+    line-height: 1.4;
+  }
+
+  .mcq-opt:hover:not(.disabled) {
+    background: var(--glass-hover);
+    color: var(--text-primary);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .mcq-opt.correct {
+    background: var(--correct-soft);
+    border-color: rgba(74,222,128,0.3);
+    color: var(--correct);
+  }
+
+  .mcq-opt.wrong {
+    background: var(--wrong-soft);
+    border-color: rgba(248,113,113,0.3);
+    color: var(--wrong);
+  }
+
+  .mcq-opt.disabled { cursor: default; }
+
+  .mcq-feedback {
+    padding: 0 20px 14px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: none;
+  }
+  .mcq-feedback.show { display: block; }
+
+  /* ── FILL IN THE BLANK CARD ── */
+  .fitb-card .card-q {
+    padding: 18px 20px 12px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.7;
+  }
+
+  .blank {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 1.5px solid var(--accent);
+    color: transparent;
+    background: var(--accent-glow);
+    border-radius: 3px;
+    padding: 1px 8px;
+    margin: 0 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    vertical-align: middle;
+    font-size: 0.88rem;
+    user-select: none;
+  }
+
+  .blank.revealed {
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-color: rgba(124,156,255,0.4);
+  }
+
+  .fitb-hint {
+    padding: 0 20px 14px;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+  }
+
+  /* ── TRUE / FALSE CARD ── */
+  .tf-card .card-q {
+    padding: 18px 20px 12px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+
+  .tf-buttons {
+    padding: 0 20px 18px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .tf-btn {
+    font-size: 0.82rem;
+    padding: 8px 22px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .tf-btn:hover:not(.disabled) {
+    background: var(--glass-hover);
+    color: var(--text-primary);
+  }
+
+  .tf-btn.correct {
+    background: var(--correct-soft);
+    border-color: rgba(74,222,128,0.3);
+    color: var(--correct);
+  }
+
+  .tf-btn.wrong {
+    background: var(--wrong-soft);
+    border-color: rgba(248,113,113,0.3);
+    color: var(--wrong);
+  }
+
+  .tf-btn.disabled { cursor: default; }
+
+  .tf-note {
+    padding: 0 20px 14px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    display: none;
+  }
+  .tf-note.show { display: block; }
+
+  /* ── SHORT / LONG ANSWER CARD ── */
+  .qa-card { cursor: pointer; }
+
+  .qa-card .card-q {
+    padding: 18px 20px 16px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .reveal-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-top: 2px;
+  }
+
+  .reveal-icon svg {
+    width: 10px;
+    height: 10px;
+    fill: var(--text-muted);
+    transition: transform 0.25s ease;
+  }
+
+  .qa-card.open .reveal-icon svg { transform: rotate(180deg); }
+  .qa-card.open .reveal-icon {
+    background: var(--accent-soft);
+    border-color: rgba(124,156,255,0.3);
+  }
+  .qa-card.open .reveal-icon svg { fill: var(--accent); }
+
+  .card-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+
+  .card-answer.open { max-height: 1200px; }
+
+  .answer-inner {
+    padding: 0 20px 18px;
+    border-top: 1px solid var(--glass-border);
+    margin: 0 0 0;
+  }
+
+  .answer-inner p, .answer-inner li {
+    font-size: 0.87rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    margin-top: 10px;
+  }
+
+  .answer-inner ul, .answer-inner ol {
+    padding-left: 18px;
+  }
+
+  .answer-inner li { margin-top: 6px; }
+
+  .answer-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 100px;
+    padding: 3px 10px;
+    margin-top: 12px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── ASSERTION REASON CARD ── */
+  .ar-card { cursor: pointer; }
+
+  .ar-card .card-q {
+    padding: 18px 20px 14px;
+  }
+
+  .ar-assertion {
+    font-size: 0.87rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .ar-reason {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.03);
+    border-radius: var(--radius-sm);
+    border-left: 2px solid var(--glass-border);
+  }
+
+  .ar-reveal-row {
+    padding: 10px 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ar-reveal-btn {
+    font-size: 0.78rem;
+    padding: 6px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--glass-border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .ar-reveal-btn:hover { background: var(--glass-hover); color: var(--text-primary); }
+
+  .ar-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 20px;
+  }
+
+  .ar-answer.open {
+    max-height: 200px;
+    padding-bottom: 16px;
+  }
+
+  .ar-answer-pill {
+    display: inline-block;
+    font-size: 0.82rem;
+    color: var(--correct);
+    background: var(--correct-soft);
+    border: 1px solid rgba(74,222,128,0.2);
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    line-height: 1.5;
+  }
+
+  /* ── MATCH THE FOLLOWING ── */
+  .match-container {
+    padding: 16px 20px 20px;
+  }
+
+  .match-title {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    letter-spacing: 0.03em;
+  }
+
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 8px 0;
+    align-items: center;
+  }
+
+  .match-left, .match-right {
+    font-size: 0.84rem;
+    padding: 9px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+
+  .match-connector {
+    width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .match-line {
+    width: 20px;
+    height: 1px;
+    background: var(--glass-border);
+    margin: 0 auto;
+    transition: background 0.3s ease;
+  }
+
+  .match-pair.revealed .match-line {
+    background: var(--accent);
+  }
+
+  .match-pair.revealed .match-left,
+  .match-pair.revealed .match-right {
+    border-color: rgba(124,156,255,0.25);
+    background: var(--accent-glow);
+  }
+
+  .match-reveal-btn {
+    margin-top: 14px;
+    font-size: 0.78rem;
+    padding: 7px 18px;
+    border-radius: 100px;
+    border: 1px solid var(--glass-border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .match-reveal-btn:hover { background: var(--glass-hover); color: var(--text-primary); }
+  .match-reveal-btn.revealed { color: var(--accent); border-color: rgba(124,156,255,0.3); background: var(--accent-glow); }
+
+  /* ── ODD ONE OUT ── */
+  .odd-card .card-q {
+    padding: 16px 20px 12px;
+    font-size: 0.87rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .odd-options {
+    padding: 0 20px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .odd-opt {
+    font-size: 0.82rem;
+    padding: 7px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--glass-border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .odd-opt:hover:not(.disabled) { background: var(--glass-hover); color: var(--text-primary); }
+  .odd-opt.correct { background: var(--correct-soft); border-color: rgba(74,222,128,0.3); color: var(--correct); }
+  .odd-opt.wrong   { background: var(--wrong-soft);   border-color: rgba(248,113,113,0.3); color: var(--wrong); }
+  .odd-opt.disabled { cursor: default; }
+
+  .odd-reason {
+    padding: 0 20px 14px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    display: none;
+  }
+  .odd-reason.show { display: block; }
+
+  /* ── DEFINE CARD ── */
+  .def-card { cursor: pointer; }
+
+  .def-card .card-q {
+    padding: 16px 20px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .def-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .def-answer.open { max-height: 300px; }
+
+  .def-answer-inner {
+    padding: 12px 20px 18px;
+    border-top: 1px solid var(--glass-border);
+    font-size: 0.86rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
+  /* ── CHAPTER NOT SELECTED ── */
+  .empty-state {
+    display: none;
+    padding: 60px 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+
+  .empty-state.show { display: block; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+  @media (max-width: 700px) {
+    header, nav { padding-left: 20px; padding-right: 20px; }
+    main { padding: 24px 20px 48px; }
+    .mcq-options { grid-template-columns: 1fr; }
+    .match-grid { grid-template-columns: 1fr auto 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-load, .page-load-delay { animation: none; }
+    .card-answer, .ar-answer, .def-answer { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="page-load">
+  <div class="site-title">ICSE <span>Notes</span></div>
+  <div class="header-badge">Class 8</div>
+</header>
+
+<nav class="page-load-delay">
+  <div class="subject-tabs" id="subjectTabs"></div>
+  <div class="chapter-tabs" id="chapterTabs"></div>
+</nav>
+
+<div class="nav-divider page-load-delay"></div>
+
+<main id="mainContent" class="page-load-delay">
+  <div class="empty-state show" id="emptyState">Select a subject and chapter above to begin.</div>
+</main>
+
+<script>
+// ════════════════════════════════════════════════
+//  DATA
+// ════════════════════════════════════════════════
+const DATA = {
+  "Civics": {
+    "The Judiciary": [
+      // ── A. MCQ
+      { type:"mcq", q:"Which jurisdiction allows the Supreme Court to be approached directly?", opts:["Appellate Jurisdiction","Original Jurisdiction","Advisory Jurisdiction","Writ Jurisdiction"], ans:1 },
+      { type:"mcq", q:"Who appoints the Chief Justice of India?", opts:["Prime Minister","President","Parliament","Supreme Court collegium"], ans:1 },
+      { type:"mcq", q:"What is the retirement age for High Court judges?", opts:["60 years","65 years","70 years","62 years"], ans:3 },
+      { type:"mcq", q:"What kind of writ is issued to prevent a lower court from exceeding its jurisdiction?", opts:["Mandamus","Habeas Corpus","Prohibition","Certiorari"], ans:2 },
+      { type:"mcq", q:"When were Lok Adalats legalised?", opts:["1987","1985","1990","1995"], ans:0 },
+
+      // ── B. Assertion & Reason
+      { type:"ar", a:"The Supreme Court of India is the highest judicial body in the country.", r:"The Supreme Court has the authority to interpret the Constitution and the power of judicial review.", ans:"(b) Both A and R are true, but R is not the correct explanation of A." },
+      { type:"ar", a:"The Supreme Court of India can issue writs to protect Fundamental Rights.", r:"Writs are legal orders issued by the Supreme Court to safeguard the Fundamental Rights enshrined in the Constitution.", ans:"(a) Both A and R are true, and R is the correct explanation of A." },
+      { type:"ar", a:"The High Courts have both original and appellate jurisdictions.", r:"Appellate jurisdiction allows the High Courts to control the actions of the lower courts.", ans:"(b) Both A and R are true, but R is not the correct explanation of A." },
+      { type:"ar", a:"The Supreme Court can hear cases involving disputes between states.", r:"High Courts cannot transfer cases from one state to another.", ans:"(b) Both A and R are true, but R is not the correct explanation of A." },
+      { type:"ar", a:"Lok Adalats can only handle informal cases, but their settlements are binding.", r:"Lok Adalats cannot hear criminal cases as they require a formal verdict of guilt or innocence.", ans:"(c) A is true, but R is false." },
+
+      // ── C. Fill in the Blanks
+      { type:"fitb", q:"The Supreme Court is the ________ court of India.", blank:"apex" },
+      { type:"fitb", q:"The ________ appoints the Chief Justice of the Supreme Court.", blank:"President" },
+      { type:"fitb", q:"The High Court is the highest court at the ________ level.", blank:"state" },
+      { type:"fitb", q:"Civil and criminal courts are found at the ________ level.", blank:"district" },
+      { type:"fitb", q:"The Lok Adalats were first established in ________.", blank:"1985" },
+
+      // ── D. Match the Following
+      { type:"match", title:"Match the Following", pairs:[
+        { left:"Habeas Corpus",            right:"Writ" },
+        { left:"Impeachment",              right:"Removal of Chief Justice" },
+        { left:"Dispute between State and Centre", right:"Original Jurisdiction" },
+        { left:"Supreme Court",            right:"Advisory function" },
+        { left:"Judicial Review",          right:"Scrutinise laws" }
+      ]},
+
+      // ── E. True / False
+      { type:"tf", q:"The High Court is the highest court of appeal in India.", ans:false, note:"The Supreme Court is the highest court of appeal in India." },
+      { type:"tf", q:"Disputes can mainly be grouped into civil and criminal cases.", ans:true, note:"" },
+      { type:"tf", q:"The judges of the Supreme Court retire at the age of 65 years.", ans:true, note:"" },
+      { type:"tf", q:"The Governor appoints judges of the High Court.", ans:false, note:"The President appoints judges of the High Court." },
+      { type:"tf", q:"The President can remove judges of any court.", ans:false, note:"The President can remove Supreme Court and High Court judges only through the constitutional removal process." },
+
+      // ── F. Answer in Brief
+      { type:"qa", q:"What is the apex court of our country?", a:"The Supreme Court of India is the apex court of our country." },
+      { type:"qa", q:"What is the composition of the Supreme Court?", a:"The Supreme Court consists of a Chief Justice and other judges. The total number of judges, including the Chief Justice, should not exceed 33." },
+      { type:"qa", q:"How does the Supreme Court serve as a Court of Record?", a:"The Supreme Court preserves its records and decisions as permanent records. These records can be used as evidence in other courts, and its decisions serve as precedents for lower courts." },
+      { type:"qa", q:"Who appoints judges of the High Court?", a:"The President of India appoints High Court judges after consultation with the Chief Justice of India and the Governor of the concerned state." },
+      { type:"qa", q:"When is the Writ of Quo Warranto issued?", a:"It is issued to question a person's legal right to hold a public office." },
+      { type:"qa", q:"When is the Writ of Prohibition issued?", a:"It is issued by a higher court to prevent a lower court from acting beyond its jurisdiction." },
+
+      // ── G. Answer in Detail
+      { type:"qa", q:"What are the qualifications required to become a judge of the Supreme Court?", a:`The qualifications are:\n- The person must be a citizen of India and hold a legal degree.\n- Must have worked as a judge of a High Court for at least five years.\n- Alternatively, must have been an advocate in a High Court or the Supreme Court for at least ten years.\n- They may also be a distinguished jurist in the opinion of the President.` },
+      { type:"qa", q:"Briefly discuss the jurisdictions of the Supreme Court.", a:`The Supreme Court has three main jurisdictions:\n\n(a) Original Jurisdiction — Cases brought directly before the Supreme Court, including disputes between the Centre and states, and cases involving violation of Fundamental Rights.\n\n(b) Appellate Jurisdiction — Hears appeals against judgments of High Courts in civil, criminal and constitutional matters. It is the final court of appeal.\n\n(c) Advisory Function — Gives legal advice to the President on important matters of law when asked. This advice is not binding on the President.\n\nThe Supreme Court can also issue writs and exercise judicial review.` },
+      { type:"qa", q:"Describe the powers and functions of High Courts in India.", a:`- Original Jurisdiction: Hears cases involving Fundamental Rights, divorce, marriage, wills and election disputes directly.\n- Appellate Jurisdiction: Hears appeals from District Courts in civil and criminal cases.\n- Writ Jurisdiction: Issues writs to protect Fundamental Rights.\n- Judicial Review: Can examine laws and declare them unconstitutional.\n- Administrative Functions: Supervises subordinate courts, makes rules for their functioning, and can transfer cases within its jurisdiction.` },
+      { type:"qa", q:"Write a short note on the functions of Lok Adalats.", a:`Lok Adalats (People's Courts) are informal courts that settle disputes quickly and economically.\n- They help people settle disputes through discussion and compromise.\n- Their services are free of cost.\n- They reduce the burden on regular courts.\n- They deal with pending cases and pre-litigation disputes.\n- Their settlements are binding and cannot be appealed.\n- They cannot pass a formal verdict or award punishment like a regular court.` },
+      { type:"qa", q:"What are Writs? When are they issued?", a:`Writs are formal legal orders issued by the Supreme Court or High Courts to protect Fundamental Rights and ensure public authorities act according to law.\n\nThe five main writs are:\n- Habeas Corpus: Protects a person against unlawful detention.\n- Mandamus: Directs a public authority to perform its legal duty.\n- Prohibition: Stops a lower court from exceeding its jurisdiction.\n- Certiorari: Quashes an order or decision of a lower court when legally justified.\n- Quo Warranto: Questions a person's legal right to hold a public office.` },
+
+      // ── H. Let's Recall
+      { type:"qa", q:"How many judges are there in the Supreme Court?", a:"Up to 33 judges, including the Chief Justice." },
+      { type:"qa", q:"For what reasons can a Supreme Court judge be impeached?", a:"For proven misbehaviour or incapacity." },
+      { type:"qa", q:"What is the lowest court in the Indian judicial structure?", a:"Nyaya Panchayat." }
+    ]
+  },
+
+  "Geography": {
+    "Asia — The Largest Continent": [
+      // ── A. MCQ
+      { type:"mcq", q:"The largest continuous plain in the world is the ________ Plain.", opts:["Siberian","Turan","Arabian","Mesopotamian"], ans:0 },
+      { type:"mcq", q:"The river plain formed by the rivers Tigris and Euphrates is known as the ________ Plain.", opts:["China","Mesopotamian","Indus","Turan"], ans:1 },
+      { type:"mcq", q:"Which of the following is a cold current?", opts:["Oyashio Current","Kuroshio Current","Black Current","Japan Current"], ans:0 },
+      { type:"mcq", q:"Which climatic region experiences diurnal temperature variation but not much seasonal variation?", opts:["China type","Mediterranean type","Equatorial type","Tropical desert type"], ans:3 },
+      { type:"mcq", q:"Sandalwood, rosewood and deodar are associated with which type of vegetation?", opts:["Equatorial","Mediterranean","Mid-latitude desert","Monsoon"], ans:3 },
+
+      // ── B. Assertion & Reason
+      { type:"ar", a:"Asia is a unique and diverse continent.", r:"It is due to its wide variety of culture, population, flora and fauna.", ans:"(a) Both A and R are true, and R is the correct explanation of A." },
+      { type:"ar", a:"Rivers Ob, Yenisei and Lena flow from south to north.", r:"The plain is higher in the south and slopes towards the north into the Arctic Ocean.", ans:"(a) Both A and R are true, and R is the correct explanation of A." },
+      { type:"ar", a:"The Arabian Plateau is a dry desert.", r:"There are many rivers originating from the Arabian Plateau.", ans:"(c) Assertion is true, but Reason is false." },
+      { type:"ar", a:"The temperature remains very high in places away from the Equator.", r:"The Equator receives the direct rays of the Sun.", ans:"(d) Assertion is false, but Reason is true." },
+      { type:"ar", a:"Monsoon determines the climate of South and South-East Asia.", r:"Monsoon winds change their direction with the change of seasons.", ans:"(a) Both A and R are true, and R is the correct explanation of A." },
+
+      // ── C. Fill in the Blanks
+      { type:"fitb", q:"________ is the only country that is spread across Europe and Asia.", blank:"Russia" },
+      { type:"fitb", q:"The Arctic, ________ and Indian Oceans all surround Asia.", blank:"Pacific" },
+      { type:"fitb", q:"The two plains of Northern Lowlands include ________ Plain and Turan Plain.", blank:"Siberian" },
+      { type:"fitb", q:"In the Central Highlands, young fold mountains originate from the ________ and the Armenian Knot.", blank:"Pamir Knot" },
+      { type:"fitb", q:"A region of coniferous forests stretching across Central Siberia is classified as ________.", blank:"Taiga" },
+
+      // ── D. True / False
+      { type:"tf", q:"A transcontinental country is a country that lies in more than one continent.", ans:true, note:"" },
+      { type:"tf", q:"Elevation is the distance from sea level.", ans:true, note:"" },
+      { type:"tf", q:"Rainfall peaks during the equinox in the equatorial type of climate.", ans:true, note:"" },
+      { type:"tf", q:"The equatorial region in Asia receives scanty rainfall of less than 50 cm.", ans:false, note:"The equatorial region receives heavy rainfall throughout the year." },
+      { type:"tf", q:"The rain shadow effect usually occurs on the windward side of mountains.", ans:false, note:"The rain shadow effect occurs on the leeward side of mountains." },
+
+      // ── E. Give Reasons
+      { type:"qa", q:"Why does the northern part of the Siberian Plain have swamps and marshes?", a:"During winter, the rivers and the upper layers of soil freeze. In spring, the upper layers thaw while the lower layers remain frozen. Water cannot drain away and collects on the surface, forming swamps and marshes." },
+      { type:"qa", q:"Why has the Aral Sea been transformed into two lakes?", a:"The Aral Sea received insufficient water from the Amu Darya and Syr Darya rivers because much of their water was diverted for irrigation. As the sea dried up, it separated into two smaller lakes." },
+      { type:"qa", q:"Why is the Tibetan Plateau known as the 'Roof of the World'?", a:"The Tibetan Plateau is the highest and largest plateau in the world, hence it is known as the 'Roof of the World'." },
+      { type:"qa", q:"Why is the Deccan Plateau called a tilted plateau?", a:"The Deccan Plateau has a steep slope towards the Arabian Sea in the west and a gentle slope towards the Bay of Bengal in the east. This uneven inclination makes it a tilted plateau." },
+      { type:"qa", q:"Why is Asia called 'the continent of contrasts'?", a:"Asia has great variations in its relief, climate, vegetation, population and culture. It has high mountains, vast plains, plateaus, hot deserts and extremely cold regions. This diversity earns it the name 'continent of contrasts'." },
+
+      // ── F. Answer in Brief
+      { type:"qa", q:"Name the physical features that separate Asia from Europe.", a:"The Ural Mountains separate most of Asia from Europe. Other features include the Ural River, the Caspian Sea, the Caucasus Mountains and the Black Sea region." },
+      { type:"qa", q:"What are steppes? Where are they located?", a:"Steppes are large areas of temperate grasslands with few or no trees. In Asia, they are mainly found in Central Asia and parts of southern Siberia and Mongolia." },
+      { type:"qa", q:"Which water body separates Asia from North America?", a:"The Bering Strait separates Asia from North America." },
+      { type:"qa", q:"What is a heat zone? How many heat zones exist?", a:"Heat zones are regions of the Earth that receive different amounts of solar heat because the Sun's rays fall at different angles. There are three main heat zones: the Torrid Zone, the Temperate Zones and the Frigid Zones." },
+      { type:"qa", q:"What is the role of ocean currents?", a:"Ocean currents influence the climate of coastal regions. Warm currents raise temperatures, while cold currents lower them. They also affect rainfall and fog formation." },
+      { type:"qa", q:"What do you understand by the rain shadow effect?", a:"The rain shadow effect occurs when mountains block moisture-laden winds. The windward side receives heavy rainfall, while the leeward side remains comparatively dry." },
+      { type:"qa", q:"How does the distance from the sea influence the climate?", a:"Coastal areas have a moderate climate because the sea heats up and cools down slowly. Areas far from the sea experience extreme temperatures — hotter summers and colder winters." },
+      { type:"qa", q:"What is a river basin?", a:"A river basin is the area of land drained by a river and its tributaries." }
+    ]
+  },
+
+  "Chemistry": {
+    "Hydrogen": [
+      // ── I. MCQ
+      { type:"mcq", q:"What is the atomic number of hydrogen?", opts:["1","2","3","4"], ans:0 },
+      { type:"mcq", q:"Which scientist did NOT contribute to the discovery of hydrogen?", opts:["Robert Boyle","Isaac Newton","Antoine Lavoisier","Henry Cavendish"], ans:1 },
+      { type:"mcq", q:"Which of the following gases is obtained when calcium is treated with water?", opts:["CO₂","CO","O₂","H₂"], ans:3 },
+      { type:"mcq", q:"Hydrogen is NOT:", opts:["A colourless gas with a pungent smell","Lighter than air","A tasteless gas","Neutral to litmus paper"], ans:0 },
+      { type:"mcq", q:"In the free state, hydrogen is present in:", opts:["Natural gas","Sun","Petroleum","Mineral salts"], ans:1 },
+      { type:"mcq", q:"When hydrogen gas is bubbled through a soap solution, the soap bubbles fly away. This demonstrates that:", opts:["Hydrogen is denser than air","Hydrogen is less dense than air","Hydrogen is the lightest gas","Hydrogen is attracted by air"], ans:1 },
+
+      // ── II. Assertion & Reason
+      { type:"ar", a:"The removal of hydrogen from a substance is called oxidation.", r:"The hydrogen molecule is monovalent.", ans:"(d) Assertion is true, but Reason is false. (Hydrogen atoms are monovalent; H₂ contains two atoms.)" },
+      { type:"ar", a:"Liquid hydrogen is used as a rocket fuel.", r:"Hydrogen is used as an oxidising agent for the production of certain metals from their oxides.", ans:"(d) Assertion is true, but Reason is false. (Hydrogen acts as a reducing agent, not an oxidising agent.)" },
+      { type:"ar", a:"Hydrogenation is the process of converting oil into a fat called vegetable ghee.", r:"It is carried out in the presence of a catalyst, usually finely divided nickel.", ans:"(a) Both A and R are true." },
+      { type:"ar", a:"Hydrogen is acidic in nature as it changes blue litmus to red.", r:"Hydrogen is combustible in nature but does not support combustion.", ans:"(c) Assertion is false, but Reason is true." },
+      { type:"ar", a:"Hydrogen is a bad conductor of heat.", r:"Hydrogen is sparingly soluble in water.", ans:"(a) Both A and R are true." },
+
+      // ── III. True / False
+      { type:"tf", q:"Hydrogen turns red litmus blue.", ans:false, note:"Hydrogen is neutral to litmus paper." },
+      { type:"tf", q:"Chemical reactions involving the addition of hydrogen are called oxidation reactions.", ans:false, note:"Such reactions are called reduction reactions." },
+      { type:"tf", q:"Steam is passed over aluminium to produce hydrogen and aluminium oxide.", ans:true, note:"2Al + 3H₂O → Al₂O₃ + 3H₂" },
+      { type:"tf", q:"Hydrogen supports combustion.", ans:false, note:"Hydrogen is combustible but does not support combustion." },
+      { type:"tf", q:"Hydrogen gas is a strong oxidising agent.", ans:false, note:"Hydrogen acts as a reducing agent in most reactions." },
+
+      // ── IV. Fill in the Blanks
+      { type:"fitb", q:"Hydrogen gas was discovered by ________ (Lavoisier/Cavendish).", blank:"Cavendish" },
+      { type:"fitb", q:"Hydrogen gas, being ________ than air, can be transferred from one vessel to another.", blank:"lighter" },
+      { type:"fitb", q:"Hydrogen is a ________ gas (combustible/non-combustible).", blank:"combustible" },
+      { type:"fitb", q:"A molecule of hydrogen consists of ________ atom(s) of hydrogen.", blank:"two" },
+      { type:"fitb", q:"________ reacts with water to produce hydrogen.", blank:"Potassium" },
+
+      // ── V. Match the Following
+      { type:"match", title:"Match the Following", pairs:[
+        { left:"A metal used in converting vegetable oils into ghee",  right:"Nickel" },
+        { left:"A flame used for cutting and welding",                 right:"Oxy-hydrogen flame" },
+        { left:"A gas used in filling weather observation balloons",   right:"Helium" },
+        { left:"An alkali that reacts with aluminium to form hydrogen",right:"Sodium" },
+        { left:"A metal that does not react with dilute sulphuric acid",right:"Lead" }
+      ]},
+
+      // ── VI. Odd One Out
+      { type:"odd", q:"Find the odd one out:", opts:["Sodium","Potassium","Calcium","Iron"], ans:3, reason:"Iron does not react with cold water under ordinary conditions, while sodium, potassium and calcium do." },
+      { type:"odd", q:"Find the odd one out:", opts:["Lightest element","Poisonous","Tasteless","Colourless"], ans:1, reason:"Hydrogen is not poisonous. It is the lightest element and a colourless, tasteless gas." },
+      { type:"odd", q:"Find the odd one out:", opts:["Magnesium","Sodium","Silver","Hydrogen"], ans:2, reason:"Silver does not readily form a stable hydride under ordinary conditions." },
+      { type:"odd", q:"Find the odd one out:", opts:["Oxidising agent","Reducing agent","Hydrogenation","Redox"], ans:2, reason:"Oxidising agent, reducing agent and redox are terms related to oxidation-reduction reactions. Hydrogenation is a separate process of adding hydrogen to a substance." },
+
+      // ── VII. Scientific Reasons
+      { type:"qa", q:"Why is hydrogen used in converting vegetable oils into ghee?", a:"Hydrogen is added to vegetable oils in the presence of finely divided nickel catalyst. This process, called hydrogenation, converts unsaturated oils into solid or semi-solid fats." },
+      { type:"qa", q:"Why is hydrogen used for cutting and welding metals?", a:"Hydrogen burns in oxygen to produce a very hot oxy-hydrogen flame. This flame generates enough heat to cut and weld metals." },
+      { type:"qa", q:"Why is hydrogen used in filling weather observation balloons?", a:"Hydrogen is lighter than air, so balloons filled with hydrogen rise in the atmosphere. (Helium is generally preferred today as it is non-flammable.)" },
+      { type:"qa", q:"Why does aluminium react with sodium hydroxide to produce hydrogen?", a:"Aluminium reacts with sodium hydroxide solution and water to form sodium aluminate and hydrogen gas, because aluminium is an amphoteric metal that reacts with both acids and alkalis." },
+      { type:"qa", q:"Why does lead not react readily with dilute sulphuric acid?", a:"Lead forms an insoluble coating of lead sulphate on its surface when it comes into contact with dilute sulphuric acid. This coating prevents further reaction." },
+
+      // ── VIII. One Word / One Sentence
+      { type:"qa", q:"Which compound is formed when hydrogen combines with nitrogen?", a:"Ammonia (NH₃)." },
+      { type:"qa", q:"What is the product of the reaction when steam is passed over red-hot iron?", a:"Magnetic iron oxide (Fe₃O₄) and hydrogen gas are formed.\n3Fe + 4H₂O → Fe₃O₄ + 4H₂" },
+      { type:"qa", q:"Name the process in which oxygen is added or hydrogen is removed.", a:"Oxidation." },
+
+      // ── IX. Define
+      { type:"def", term:"Hydrogenation", def:"The process of adding hydrogen to unsaturated vegetable oils in the presence of a catalyst (finely divided nickel) to convert them into solid or semi-solid fats." },
+      { type:"def", term:"Electrolysis", def:"The chemical decomposition of an electrolyte by passing an electric current through its molten or aqueous solution." },
+      { type:"def", term:"Combustion", def:"A chemical process in which a substance reacts with oxygen and releases heat, usually with light." },
+      { type:"def", term:"Electrode", def:"A conductor through which electric current enters or leaves an electrolyte during electrolysis." }
+    ]
+  }
+};
+
+// ════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════
+let currentSubject = null;
+let currentChapter = null;
+
+// ════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════
+function init() {
+  const subjectTabsEl = document.getElementById('subjectTabs');
+  Object.keys(DATA).forEach(subj => {
+    const btn = document.createElement('button');
+    btn.className = 'subject-tab';
+    btn.textContent = subj;
+    btn.onclick = () => selectSubject(subj);
+    subjectTabsEl.appendChild(btn);
+  });
+}
+
+function selectSubject(subj) {
+  currentSubject = subj;
+  currentChapter = null;
+
+  document.querySelectorAll('.subject-tab').forEach(b => b.classList.toggle('active', b.textContent === subj));
+
+  const chapterTabsEl = document.getElementById('chapterTabs');
+  chapterTabsEl.innerHTML = '';
+  Object.keys(DATA[subj]).forEach(ch => {
+    const btn = document.createElement('button');
+    btn.className = 'chapter-tab';
+    btn.textContent = ch;
+    btn.onclick = () => selectChapter(subj, ch);
+    chapterTabsEl.appendChild(btn);
+  });
+
+  document.getElementById('mainContent').innerHTML = '<div class="empty-state show" id="emptyState">Select a chapter above.</div>';
+}
+
+function selectChapter(subj, ch) {
+  currentChapter = ch;
+  document.querySelectorAll('.chapter-tab').forEach(b => b.classList.toggle('active', b.textContent === ch));
+  renderChapter(DATA[subj][ch]);
+}
+
+// ════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════
+function renderChapter(items) {
+  const main = document.getElementById('mainContent');
+  main.innerHTML = '';
+
+  // group by type
+  const groups = [
+    { label:"Multiple Choice Questions",  types:["mcq"],   items:[] },
+    { label:"Assertion & Reason",          types:["ar"],    items:[] },
+    { label:"Fill in the Blanks",          types:["fitb"],  items:[] },
+    { label:"Match the Following",         types:["match"], items:[] },
+    { label:"True or False",               types:["tf"],    items:[] },
+    { label:"Odd One Out",                 types:["odd"],   items:[] },
+    { label:"Definitions",                 types:["def"],   items:[] },
+    { label:"Questions & Answers",         types:["qa"],    items:[] },
+  ];
+
+  items.forEach(item => {
+    for (const g of groups) {
+      if (g.types.includes(item.type)) { g.items.push(item); break; }
+    }
+  });
+
+  groups.forEach(g => {
+    if (!g.items.length) return;
+    const block = document.createElement('div');
+    block.className = 'section-block visible';
+
+    const heading = document.createElement('div');
+    heading.className = 'section-heading';
+    heading.textContent = g.label;
+    block.appendChild(heading);
+
+    const grid = document.createElement('div');
+    grid.className = 'questions-grid';
+
+    g.items.forEach((item, i) => {
+      let card;
+      if (item.type === 'mcq')   card = buildMCQ(item, i);
+      if (item.type === 'ar')    card = buildAR(item, i);
+      if (item.type === 'fitb')  card = buildFITB(item, i);
+      if (item.type === 'match') card = buildMatch(item, i);
+      if (item.type === 'tf')    card = buildTF(item, i);
+      if (item.type === 'qa')    card = buildQA(item, i);
+      if (item.type === 'odd')   card = buildOdd(item, i);
+      if (item.type === 'def')   card = buildDef(item, i);
+      if (card) grid.appendChild(card);
+    });
+
+    block.appendChild(grid);
+    main.appendChild(block);
+  });
+}
+
+// ── MCQ
+function buildMCQ(item, idx) {
+  const uid = 'mcq-' + idx + '-' + Math.random().toString(36).slice(2,6);
+  const card = el('div', 'card mcq-card');
+  const qDiv = el('div', 'card-q');
+  qDiv.textContent = (idx+1) + '. ' + item.q;
+  card.appendChild(qDiv);
+
+  const opts = el('div', 'mcq-options');
+  const labels = ['(a)','(b)','(c)','(d)'];
+  const feedback = el('div', 'mcq-feedback');
+
+  item.opts.forEach((opt, oi) => {
+    const btn = el('button', 'mcq-opt');
+    btn.textContent = labels[oi] + ' ' + opt;
+    btn.dataset.idx = oi;
+    btn.onclick = function() {
+      if (card.dataset.done) return;
+      card.dataset.done = '1';
+      card.querySelectorAll('.mcq-opt').forEach(b => {
+        const bi = parseInt(b.dataset.idx);
+        b.classList.add('disabled');
+        if (bi === item.ans) b.classList.add('correct');
+        else if (bi === oi && bi !== item.ans) b.classList.add('wrong');
+      });
+      feedback.textContent = oi === item.ans ? '✓ Correct!' : '✗ The correct answer is ' + labels[item.ans] + ' ' + item.opts[item.ans];
+      feedback.classList.add('show');
+    };
+    opts.appendChild(btn);
+  });
+
+  card.appendChild(opts);
+  card.appendChild(feedback);
+  return card;
+}
+
+// ── ASSERTION & REASON
+function buildAR(item, idx) {
+  const card = el('div', 'card ar-card');
+  const qDiv = el('div', 'card-q');
+
+  const aLine = el('div', 'ar-assertion');
+  aLine.textContent = 'Assertion (A): ' + item.a;
+  const rLine = el('div', 'ar-reason');
+  rLine.textContent = 'Reason (R): ' + item.r;
+  qDiv.appendChild(aLine);
+  qDiv.appendChild(rLine);
+  card.appendChild(qDiv);
+
+  const row = el('div', 'ar-reveal-row');
+  const btn = el('button', 'ar-reveal-btn');
+  btn.textContent = 'Show answer';
+  row.appendChild(btn);
+  card.appendChild(row);
+
+  const ansDiv = el('div', 'ar-answer');
+  const pill = el('div', 'ar-answer-pill');
+  pill.textContent = item.ans;
+  ansDiv.appendChild(pill);
+  card.appendChild(ansDiv);
+
+  btn.onclick = () => {
+    const open = ansDiv.classList.toggle('open');
+    btn.textContent = open ? 'Hide answer' : 'Show answer';
+  };
+
+  return card;
+}
+
+// ── FILL IN THE BLANK
+function buildFITB(item, idx) {
+  const card = el('div', 'card fitb-card');
+  const qDiv = el('div', 'card-q');
+
+  const parts = item.q.split('________');
+  parts.forEach((part, i) => {
+    qDiv.appendChild(document.createTextNode(part));
+    if (i < parts.length - 1) {
+      const blankEl = el('span', 'blank');
+      blankEl.dataset.answer = item.blank;
+      blankEl.textContent = item.blank;
+      blankEl.setAttribute('aria-label', 'Click to reveal: ' + item.blank);
+      blankEl.onclick = () => blankEl.classList.toggle('revealed');
+      qDiv.appendChild(blankEl);
+    }
+  });
+
+  card.appendChild(qDiv);
+  const hint = el('div', 'fitb-hint');
+  hint.textContent = 'Click the blank to reveal the answer.';
+  card.appendChild(hint);
+  return card;
+}
+
+// ── MATCH THE FOLLOWING
+function buildMatch(item, idx) {
+  const card = el('div', 'card');
+  const container = el('div', 'match-container');
+
+  const title = el('div', 'match-title');
+  title.textContent = item.title;
+  container.appendChild(title);
+
+  const grid = el('div', 'match-grid');
+  const pairs = [];
+
+  item.pairs.forEach((pair, i) => {
+    const leftEl = el('div', 'match-left');
+    leftEl.textContent = pair.left;
+    const connEl = el('div', 'match-connector');
+    const lineEl = el('div', 'match-line');
+    connEl.appendChild(lineEl);
+    const rightEl = el('div', 'match-right');
+    rightEl.textContent = pair.right;
+
+    grid.appendChild(leftEl);
+    grid.appendChild(connEl);
+    grid.appendChild(rightEl);
+    pairs.push({ left: leftEl, conn: connEl, right: rightEl });
+  });
+
+  container.appendChild(grid);
+
+  let revealed = false;
+  const btn = el('button', 'match-reveal-btn');
+  btn.textContent = 'Reveal all matches';
+  btn.onclick = () => {
+    revealed = !revealed;
+    grid.querySelectorAll('.match-left, .match-right, .match-connector').forEach((el, i) => {
+      const row = Math.floor(i / 3);
+      const rowEl = grid.children[row * 3];
+      const pairDiv = { left: grid.children[row*3], conn: grid.children[row*3+1], right: grid.children[row*3+2] };
+    });
+    // Reveal all pairs
+    let i = 0;
+    item.pairs.forEach(() => {
+      [grid.children[i*3], grid.children[i*3+1], grid.children[i*3+2]].forEach(node => {
+        if (revealed) node.classList.add('revealed');
+        else node.classList.remove('revealed');
+      });
+      i++;
+    });
+    btn.textContent = revealed ? 'Hide matches' : 'Reveal all matches';
+    btn.classList.toggle('revealed', revealed);
+  };
+
+  container.appendChild(btn);
+  card.appendChild(container);
+  return card;
+}
+
+// ── TRUE / FALSE
+function buildTF(item, idx) {
+  const card = el('div', 'card tf-card');
+  const qDiv = el('div', 'card-q');
+  qDiv.textContent = (idx+1) + '. ' + item.q;
+  card.appendChild(qDiv);
+
+  const btns = el('div', 'tf-buttons');
+  const noteEl = el('div', 'tf-note');
+
+  ['True','False'].forEach(label => {
+    const btn = el('button', 'tf-btn');
+    btn.textContent = label;
+    btn.onclick = () => {
+      if (card.dataset.done) return;
+      card.dataset.done = '1';
+      const chosen = label === 'True';
+      const correct = item.ans;
+      card.querySelectorAll('.tf-btn').forEach(b => {
+        b.classList.add('disabled');
+        if (b.textContent === 'True' && correct) b.classList.add('correct');
+        else if (b.textContent === 'False' && !correct) b.classList.add('correct');
+        else if (b.textContent === label) b.classList.add('wrong');
+      });
+      if (item.note) { noteEl.textContent = item.note; noteEl.classList.add('show'); }
+    };
+    btns.appendChild(btn);
+  });
+
+  card.appendChild(btns);
+  card.appendChild(noteEl);
+  return card;
+}
+
+// ── Q & A
+function buildQA(item, idx) {
+  const card = el('div', 'card qa-card');
+
+  const qDiv = el('div', 'card-q');
+  const qText = el('span');
+  qText.textContent = item.q;
+  const icon = el('div', 'reveal-icon');
+  icon.innerHTML = `<svg viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l4 4 4-4"/></svg>`;
+  icon.querySelector('svg').style.fill = 'none';
+  icon.querySelector('svg').style.stroke = 'rgba(255,255,255,0.4)';
+  icon.querySelector('svg').style.strokeWidth = '1.5';
+  icon.querySelector('svg').style.strokeLinecap = 'round';
+  qDiv.appendChild(qText);
+  qDiv.appendChild(icon);
+  card.appendChild(qDiv);
+
+  const ansDiv = el('div', 'card-answer');
+  const ansInner = el('div', 'answer-inner');
+
+  // Handle multiline answers
+  const lines = item.a.split('\n').filter(l => l.trim());
+  lines.forEach(line => {
+    if (line.startsWith('- ')) {
+      const ul = ansInner.lastElementChild?.tagName === 'UL'
+        ? ansInner.lastElementChild
+        : (() => { const u = el('ul'); ansInner.appendChild(u); return u; })();
+      const li = el('li');
+      li.textContent = line.slice(2);
+      ul.appendChild(li);
+    } else {
+      const p = el('p');
+      p.textContent = line;
+      ansInner.appendChild(p);
+    }
+  });
+
+  ansDiv.appendChild(ansInner);
+  card.appendChild(ansDiv);
+
+  card.onclick = () => {
+    const open = ansDiv.classList.toggle('open');
+    card.classList.toggle('open', open);
+  };
+
+  return card;
+}
+
+// ── ODD ONE OUT
+function buildOdd(item, idx) {
+  const card = el('div', 'card odd-card');
+  const qDiv = el('div', 'card-q');
+  qDiv.textContent = (idx+1) + '. ' + item.q;
+  card.appendChild(qDiv);
+
+  const optsEl = el('div', 'odd-options');
+  const reason = el('div', 'odd-reason');
+
+  item.opts.forEach((opt, oi) => {
+    const btn = el('button', 'odd-opt');
+    btn.textContent = opt;
+    btn.onclick = () => {
+      if (card.dataset.done) return;
+      card.dataset.done = '1';
+      card.querySelectorAll('.odd-opt').forEach((b, bi) => {
+        b.classList.add('disabled');
+        if (bi === item.ans) b.classList.add('correct');
+        else if (bi === oi && bi !== item.ans) b.classList.add('wrong');
+      });
+      reason.textContent = item.reason;
+      reason.classList.add('show');
+    };
+    optsEl.appendChild(btn);
+  });
+
+  card.appendChild(optsEl);
+  card.appendChild(reason);
+  return card;
+}
+
+// ── DEFINITIONS
+function buildDef(item, idx) {
+  const card = el('div', 'card def-card');
+
+  const qDiv = el('div', 'card-q');
+  const term = el('span');
+  term.textContent = item.term;
+  const icon = el('div', 'reveal-icon');
+  icon.innerHTML = `<svg viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round"><path d="M1 1l4 4 4-4"/></svg>`;
+  qDiv.appendChild(term);
+  qDiv.appendChild(icon);
+  card.appendChild(qDiv);
+
+  const defDiv = el('div', 'def-answer');
+  const defInner = el('div', 'def-answer-inner');
+  defInner.textContent = item.def;
+  defDiv.appendChild(defInner);
+  card.appendChild(defDiv);
+
+  card.onclick = () => {
+    const open = defDiv.classList.toggle('open');
+    card.classList.toggle('open', open);
+    icon.style.background = open ? 'var(--accent-soft)' : '';
+  };
+
+  return card;
+}
+
+// ── UTIL
+function el(tag, cls) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  return e;
+}
+
+// ── START
+init();
+</script>
+</body>
+</html>
